@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Painel de patrimônio e inventário de notebooks da equipe de TI.">
+  <title>Inventário de Notebooks | Patrimônio TI</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">PTI</div>
+        <div class="brand-copy">
+          <span class="brand-title">Patrimônio TI</span>
+          <span class="brand-subtitle">Inventário de notebooks</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <span class="mode-badge" id="mode-badge">Consulta pública</span>
+        <div class="user-area" id="user-area" hidden>
+          <span class="user-name" id="user-name"></span>
+          <button class="btn btn-quiet" id="btn-sair" type="button">Sair</button>
+        </div>
+        <button class="btn btn-outline" id="btn-abrir-login" type="button">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Área restrita
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <nav class="nav" aria-label="Navegacao principal">
+          <button class="nav-item active" type="button" data-view="visao-geral">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Visão geral
+          </button>
+          <button class="nav-item" type="button" data-view="equipamentos">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1"/><path d="M2 19h20l-1.5-3H3.5L2 19Z"/></svg>
+            Equipamentos
+          </button>
+          <button class="nav-item" type="button" data-view="gestao" id="nav-gestao" hidden>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+            Gestão do inventário
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-label">Fonte dos dados</div>
+          <div class="sidebar-value" id="fonte-dados">Planilha de inventário</div>
+          <div class="sidebar-label">Última importação</div>
+          <div class="sidebar-value" id="ultima-importacao">-</div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="view active" id="view-visao-geral" aria-labelledby="titulo-visao">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Painel de patrimônio</p>
+              <h1 id="titulo-visao">Visão geral</h1>
+              <p class="lead">Situação dos notebooks registrados no inventário dos professores.</p>
+            </div>
+            <div class="page-status">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span id="atualizado-em">Carregando dados...</span>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="kpi-grid"></div>
+
+          <div class="panel-grid">
+            <article class="panel">
+              <header class="panel-head">
+                <div>
+                  <p class="eyebrow small">Distribuição</p>
+                  <h2>Status funcional</h2>
+                </div>
+                <span class="panel-note">Quantidade por situação</span>
+              </header>
+              <div class="bars" id="barras-status"></div>
+            </article>
+
+            <article class="panel">
+              <header class="panel-head">
+                <div>
+                  <p class="eyebrow small">Conservação</p>
+                  <h2>Estado físico</h2>
+                </div>
+                <span class="panel-note">Quantidade por estado</span>
+              </header>
+              <div class="bars" id="barras-estado"></div>
+            </article>
+          </div>
+
+          <article class="panel panel-full">
+            <header class="panel-head">
+              <div>
+                <p class="eyebrow small">Localização</p>
+                <h2>Disponibilidade por local</h2>
+              </div>
+              <span class="panel-note">Disponível = funcionando, com carregador e sem dano relevante</span>
+            </header>
+            <div class="table-wrap">
+              <table class="data-table compact">
+                <thead>
+                  <tr>
+                    <th>Local</th>
+                    <th class="num">Total</th>
+                    <th class="num">Funcionando</th>
+                    <th class="num">Disponíveis</th>
+                    <th class="num">Indisponíveis</th>
+                    <th class="num">Sem info.</th>
+                    <th class="participation">Participação</th>
+                  </tr>
+                </thead>
+                <tbody id="corpo-locais"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="view" id="view-equipamentos" aria-labelledby="titulo-equipamentos">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Base de dados</p>
+              <h1 id="titulo-equipamentos">Equipamentos</h1>
+              <p class="lead">Consulta individual dos notebooks importados da planilha.</p>
+            </div>
+          </div>
+
+          <article class="panel">
+            <header class="panel-head">
+              <div>
+                <p class="eyebrow small">Inventário</p>
+                <h2>Registro detalhado</h2>
+              </div>
+              <span class="panel-note" id="contador-equipamentos">0 equipamentos</span>
+            </header>
+
+            <div class="filters">
+              <label class="search-field">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input type="search" id="filtro-busca" placeholder="Buscar por etiqueta, série, marca ou modelo" autocomplete="off">
+              </label>
+              <select id="filtro-status" aria-label="Filtrar por status">
+                <option value="">Todos os status</option>
+              </select>
+              <select id="filtro-local" aria-label="Filtrar por localização">
+                <option value="">Todas as localizações</option>
+              </select>
+              <select id="filtro-origem" aria-label="Filtrar por planilha de origem">
+                <option value="">Todas as origens</option>
+              </select>
+              <button class="btn btn-quiet" id="btn-limpar-filtros" type="button">Limpar filtros</button>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Etiqueta</th>
+                    <th>Número de série</th>
+                    <th>Localização</th>
+                    <th>Equipamento</th>
+                    <th>Estado físico</th>
+                    <th>Status</th>
+                    <th>Carregador</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="corpo-equipamentos"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="view" id="view-gestao" aria-labelledby="titulo-gestao">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">Acesso controlado</p>
+              <h1 id="titulo-gestao">Gestão do inventário</h1>
+              <p class="lead">Alterações no banco de dados são permitidas somente com autenticação.</p>
+            </div>
+          </div>
+
+          <div class="panel locked-panel" id="gestao-bloqueado">
+            <div class="lock-icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            </div>
+            <h2>Área restrita</h2>
+            <p>A consulta ao painel e pública. Para cadastrar, editar ou atualizar equipamentos, entre com as credenciais fornecidas pela equipe de TI.</p>
+            <button class="btn btn-primary" id="btn-abrir-login-gestao" type="button">Entrar na área restrita</button>
+          </div>
+
+          <div id="gestao-liberado" hidden>
+            <div class="panel-grid">
+              <article class="panel form-panel">
+                <header class="panel-head">
+                  <div>
+                    <p class="eyebrow small">Cadastro</p>
+                    <h2 id="titulo-formulario">Novo equipamento</h2>
+                  </div>
+                  <button class="btn btn-quiet" id="btn-novo" type="button">Novo registro</button>
+                </header>
+
+                <form id="form-equipamento" class="form-grid">
+                  <input type="hidden" name="origem" value="Cadastro manual">
+
+                  <label class="field">
+                    <span>Etiqueta / ID</span>
+                    <input name="etiqueta" maxlength="80" placeholder="Ex.: C1-041" required>
+                  </label>
+                  <label class="field">
+                    <span>Número de série</span>
+                    <input name="numero_série" maxlength="120" placeholder="Ex.: 4A957N13S">
+                  </label>
+                  <label class="field">
+                    <span>Localização</span>
+                    <input name="localizacao" maxlength="120" placeholder="Ex.: Carrinho 1">
+                  </label>
+                  <label class="field">
+                    <span>Marca</span>
+                    <input name="marca" maxlength="80" placeholder="Ex.: Samsung">
+                  </label>
+                  <label class="field">
+                    <span>Modelo</span>
+                    <input name="modelo" maxlength="80" placeholder="Ex.: Chrome Book">
+                  </label>
+                  <label class="field">
+                    <span>Estado físico</span>
+                    <select name="estado_fisico">
+                      <option value="Sem informação">Sem informação</option>
+                      <option value="Bom">Bom</option>
+                      <option value="Regular">Regular</option>
+                      <option value="Ruim">Ruim</option>
+                      <option value="Danificado">Danificado</option>
+                      <option value="Não localizado">Não localizado</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Status funcional</span>
+                    <select name="status">
+                      <option value="Sem informação">Sem informação</option>
+                      <option value="Funcionando">Funcionando</option>
+                      <option value="Com defeito">Com defeito</option>
+                      <option value="Não liga">Não liga</option>
+                      <option value="Aguardando reparo">Aguardando reparo</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Carregador incluso</span>
+                    <select name="carregador">
+                      <option value="Sem informação">Sem informação</option>
+                      <option value="Sim">Sim</option>
+                      <option value="Não">Não</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Data do levantamento</span>
+                    <input type="date" name="data_levantamento">
+                  </label>
+                  <label class="field">
+                    <span>Responsável pelo levantamento</span>
+                    <input name="responsavel_levantamento" maxlength="120">
+                  </label>
+                  <label class="field field-wide">
+                    <span>Observações</span>
+                    <textarea name="observacoes" rows="3" maxlength="1000" placeholder="Defeitos, peças faltantes ou outras informações relevantes"></textarea>
+                  </label>
+                </form>
+
+                <div class="form-actions">
+                  <button class="btn btn-primary" id="btn-salvar" type="button" form="form-equipamento">Salvar no banco</button>
+                  <span class="form-hint" id="form-hint">Preencha os dados e salve para atualizar o inventário.</span>
+                </div>
+              </article>
+
+              <aside class="panel admin-panel">
+                <header class="panel-head">
+                  <div>
+                    <p class="eyebrow small">Administração</p>
+                    <h2>Banco de dados</h2>
+                  </div>
+                </header>
+                <p class="admin-text">Os dados exibidos no painel vêm de um banco SQLite alimentado pela planilha de inventário. A reimportação substitui todos os registros pelos dados atuais da planilha.</p>
+                <div class="admin-info">
+                  <span>Registros armazenados</span>
+                  <strong id="admin-total">0</strong>
+                </div>
+                <div class="admin-info">
+                  <span>Planilha de origem</span>
+                  <strong id="admin-origem">-</strong>
+                </div>
+                <div class="admin-info">
+                  <span>Nível de acesso</span>
+                  <strong id="admin-perfil">-</strong>
+                </div>
+                <div class="admin-actions" id="acoes-administrador" hidden>
+                  <a class="btn btn-primary full" href="/api/exportar.xlsx" download>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>
+                    Exportar planilha XLSX
+                  </a>
+                  <a class="btn btn-outline full" href="/api/exportar.csv" download>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>
+                    Exportar CSV
+                  </a>
+                  <button class="btn btn-outline full" id="btn-importar" type="button">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>
+                    Reimportar planilha
+                  </button>
+                </div>
+                <p class="admin-warning" id="admin-warning" hidden>A exportação, a reimportação e a exclusão de registros exigem o perfil de administrador.</p>
+              </aside>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-login" hidden>
+    <div class="modal-backdrop" data-fechar="login"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="login-titulo">
+      <button class="modal-close" type="button" data-fechar="login" aria-label="Fechar">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <p class="eyebrow">Acesso restrito</p>
+      <h2 id="login-titulo">Entrar no painel de gestão</h2>
+      <p class="modal-desc">Informe as credenciais fornecidas pela equipe de TI para alterar o inventário.</p>
+      <form id="form-login">
+        <label class="field">
+          <span>Usuário</span>
+          <input name="usuario" autocomplete="username" required autofocus>
+        </label>
+        <label class="field">
+          <span>Senha</span>
+          <input name="senha" type="password" autocomplete="current-password" required>
+        </label>
+        <p class="form-error" id="login-erro" hidden></p>
+        <button class="btn btn-primary full" type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-confirm" hidden>
+    <div class="modal-backdrop" data-fechar="confirm"></div>
+    <div class="modal-card modal-small" role="alertdialog" aria-modal="true" aria-labelledby="confirmar-titulo">
+      <p class="eyebrow">Confirmação</p>
+      <h2 id="confirmar-titulo">Confirmar ação</h2>
+      <p class="modal-desc" id="confirmar-mensagem"></p>
+      <div class="modal-actions">
+        <button class="btn btn-quiet" type="button" id="btn-confirmar-cancelar">Cancelar</button>
+        <button class="btn btn-danger" type="button" id="btn-confirmar-ok">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

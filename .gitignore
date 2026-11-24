@@ -1,0 +1,28 @@
+# Segredos e dados locais - NUNCA publicar
+.env
+.env.*
+!.env.example
+config.local.json
+*.key
+*.pem
+*.pfx
+
+# Planilhas e banco de dados
+*.xlsx
+*.xlsm
+*.xls
+*.enc
+inventario.db
+inventario.db-*
+dados/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logs e sistema
+*.log
+Thumbs.db
+desktop.ini
